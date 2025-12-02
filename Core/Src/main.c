@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "bmp280.h"
+#include "aht20.h"
 #include "gpio.h"
 #include "i2c.h"
 #include "usart.h"
@@ -47,7 +47,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-BMP280_HandleTypeDef hbmp280;
+AHT20_HandleTypeDef haht20;
 
 /* USER CODE END PV */
 
@@ -74,8 +74,8 @@ int _write(int file, char *ptr, int len) {
 int main(void) {
 
   /* USER CODE BEGIN 1 */
-  float bmp280_temperature = 0.0f;
-  float bmp280_pressure = 0.0f;
+  float aht20_temperature = 0.0f;
+  float aht20_humidity = 0.0f;
   HAL_StatusTypeDef hal_status;
   /* USER CODE END 1 */
 
@@ -101,31 +101,16 @@ int main(void) {
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  printf("\r\n=== BMP280 Driver Test ===\r\n");
+  printf("\r\n=== AHT20 Driver Test ===\r\n");
   printf("System Clock: %lu Hz\r\n", (unsigned long)HAL_RCC_GetSysClockFreq());
   printf("PCLK1: %lu Hz\r\n", (unsigned long)HAL_RCC_GetPCLK1Freq());
 
-  printf("\r\n=== Initializing BMP280 ===\r\n");
-  hal_status = BMP280_Init(&hbmp280, &hi2c1, BMP280_ADDRESS_1);
+  printf("\r\n=== Initializing AHT20 ===\r\n");
+  hal_status = AHT20_Init(&haht20, &hi2c1, AHT20_ADDRESS);
   if (hal_status != HAL_OK) {
-    printf("BMP280 initialization error: %d\r\n", hal_status);
-    printf("Trying alternate address (0x76)...\r\n");
-    hal_status = BMP280_Init(&hbmp280, &hi2c1, BMP280_ADDRESS_0);
-    if (hal_status != HAL_OK) {
-      printf("BMP280 not found at either address!\r\n");
-    }
+    printf("AHT20 initialization error: %d\r\n", hal_status);
   }
-  printf("BMP280 initialized\r\n");
-
-  printf("\r\n=== Configuring BMP280 ===\r\n");
-  hal_status = BMP280_Configure(&hbmp280, BMP280_STANDBY_0_5MS, BMP280_FILTER_4,
-                                BMP280_OVERSAMPLING_2X, BMP280_OVERSAMPLING_16X,
-                                BMP280_MODE_NORMAL);
-
-  if (hal_status != HAL_OK) {
-    printf("BMP280 configuration error: %d\r\n", hal_status);
-  }
-  printf("BMP280 configured!\r\n");
+  printf("AHT20 initialized\r\n");
 
   printf("\r\n=== Starting measurements ===\r\n\r\n");
   /* USER CODE END 2 */
@@ -133,19 +118,16 @@ int main(void) {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    hal_status =
-        BMP280_ReadAll(&hbmp280, &bmp280_temperature, &bmp280_pressure);
+    hal_status = AHT20_ReadAll(&haht20, &aht20_temperature, &aht20_humidity);
 
     if (hal_status == HAL_OK) {
-      float pressure_hPa = bmp280_pressure / 100.0f;
-
-      printf("BMP280 | Temperature: %.2f °C | Pressure: %.2f hPa (%.2f Pa)\r\n",
-             bmp280_temperature, pressure_hPa, bmp280_pressure);
+      printf("AHT20 | Temperature: %.2f °C | Humidity: %.2f RH\r\n",
+             aht20_temperature, aht20_humidity);
     } else {
-      printf("BMP280 | Error reading sensor! Status: %d\r\n", hal_status);
+      printf("AHT20 | Error reading sensor! Status: %d\r\n", hal_status);
     }
 
-    HAL_Delay(1000);
+    HAL_Delay(2000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
