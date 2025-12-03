@@ -45,15 +45,20 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+    Utils/delay_us.c
     Drivers/BMP280/bmp280.c
     Drivers/AHT20/aht20.c
-)
+    Drivers/GDM1602A/gdm1602a.c
+    Drivers/GDM1602A/gdm1602a_test.c
+    )
 
-# Add include paths
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add include paths
+    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+    Utils/
     Drivers/BMP280
     Drivers/AHT20
+    Drivers/GDM1602A
 )
 
 # Add project symbols (macros)

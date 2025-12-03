@@ -24,9 +24,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "aht20.h"
-#include "gpio.h"
+#include "delay_us.h"
+#include "gdm1602a.h"
+#include "gdm1602a_test.h"
 #include <stdio.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,14 +49,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-AHT20_HandleTypeDef haht20;
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -74,9 +74,7 @@ int _write(int file, char *ptr, int len) {
 int main(void) {
 
   /* USER CODE BEGIN 1 */
-  float aht20_temperature = 0.0f;
-  float aht20_humidity = 0.0f;
-  HAL_StatusTypeDef hal_status;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -101,33 +99,27 @@ int main(void) {
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  printf("\r\n=== AHT20 Driver Test ===\r\n");
-  printf("System Clock: %lu Hz\r\n", (unsigned long)HAL_RCC_GetSysClockFreq());
-  printf("PCLK1: %lu Hz\r\n", (unsigned long)HAL_RCC_GetPCLK1Freq());
+  delay_us_init();
+  HAL_Delay(2000);
 
-  printf("\r\n=== Initializing AHT20 ===\r\n");
-  hal_status = AHT20_Init(&haht20, &hi2c1, AHT20_ADDRESS);
-  if (hal_status != HAL_OK) {
-    printf("AHT20 initialization error: %d\r\n", hal_status);
+  gdm1602a_init();
+  gdm1602a_clear();
+
+  if (delay_us_is_initialized()) {
+    gdm1602a_printf(0, 0, "DWT: OK");
+  } else {
+    gdm1602a_printf(0, 0, "DWT: FAILED");
+    gdm1602a_printf(1, 0, "Using fallback");
   }
-  printf("AHT20 initialized\r\n");
 
-  printf("\r\n=== Starting measurements ===\r\n\r\n");
+  HAL_Delay(2000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    hal_status = AHT20_ReadAll(&haht20, &aht20_temperature, &aht20_humidity);
-
-    if (hal_status == HAL_OK) {
-      printf("AHT20 | Temperature: %.2f °C | Humidity: %.2f RH\r\n",
-             aht20_temperature, aht20_humidity);
-    } else {
-      printf("AHT20 | Error reading sensor! Status: %d\r\n", hal_status);
-    }
-
-    HAL_Delay(2000);
+    gdm1602a_test_all();
+    HAL_Delay(5000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
