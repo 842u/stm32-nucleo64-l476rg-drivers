@@ -41,44 +41,11 @@
  */
 void MX_GPIO_Init(void) {
 
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LCD_RS_Pin | LCD_E_Pin | LCD_DB4_Pin | LCD_DB7_Pin,
-                    GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LCD_DB6_GPIO_Port, LCD_DB6_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LCD_DB5_GPIO_Port, LCD_DB5_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : LCD_RS_Pin LCD_E_Pin LCD_DB4_Pin LCD_DB7_Pin */
-  GPIO_InitStruct.Pin = LCD_RS_Pin | LCD_E_Pin | LCD_DB4_Pin | LCD_DB7_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LCD_DB6_Pin */
-  GPIO_InitStruct.Pin = LCD_DB6_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LCD_DB6_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LCD_DB5_Pin */
-  GPIO_InitStruct.Pin = LCD_DB5_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LCD_DB5_GPIO_Port, &GPIO_InitStruct);
 }
 
 /* USER CODE BEGIN 2 */
