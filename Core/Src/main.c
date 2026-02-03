@@ -18,27 +18,21 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
+#include "delay_us.h"
 #include "gpio.h"
-#include "i2c.h"
-#include "stm32l4xx_hal.h"
-#include "stm32l4xx_hal_adc_ex.h"
 #include "usart.h"
-#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "hw390.h"
+#include "one_wire.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-HW390_HandleTypeDef soil_sensor;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define CALIBRATION_FLASH_ADDR 0x080FF000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -84,7 +78,7 @@ int main(void) {
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  delay_us_init();
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -97,68 +91,20 @@ int main(void) {
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  MX_I2C1_Init();
-  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-
-  hw390_init(&soil_sensor, &hadc1, 0x1, CALIBRATION_FLASH_ADDR);
-
-  printf("=== HW390 Soil Sensor ===\r\n\n");
-
-  hw390_debug_flash(&soil_sensor);
-
-  hw390_erase_calibration(&soil_sensor);
-
-  printf("Flash erased!\r\n");
-  hw390_debug_flash(&soil_sensor);
-
-  if (!hw390_load_calibration(&soil_sensor)) {
-    printf("\nNo valid calibration found! Starting calibration...\r\n");
-
-    printf("\n=== DRY Calibration ===\r\n");
-    printf("Place sensor in DRY environment (air)\r\n");
-    printf("Reading in 3 seconds...\r\n");
-    HAL_Delay(3000);
-
-    printf("Reading dry value (10 seconds)...\r\n");
-    hw390_calibrate(&soil_sensor, true);
-    printf("Dry value: %u\r\n", soil_sensor.calibration.dry_value);
-
-    printf("\n=== WET Calibration ===\r\n");
-    printf("Place sensor in WET environment (water)\r\n");
-    printf("Reading in 3 seconds...\r\n");
-    HAL_Delay(3000);
-
-    printf("Reading wet value (10 seconds)...\r\n");
-    hw390_calibrate(&soil_sensor, false);
-    printf("Wet value: %u\r\n", soil_sensor.calibration.wet_value);
-
-    printf("\nSaving calibration to flash...\r\n");
-    hw390_save_calibration(&soil_sensor);
-    printf("Calibration saved!\r\n");
-
-    // Verify what was saved
-    hw390_debug_flash(&soil_sensor);
-
-  } else {
-    printf("\nCalibration loaded successfully!\r\n");
-    printf("Dry: %u, Wet: %u\r\n\n", soil_sensor.calibration.dry_value,
-           soil_sensor.calibration.wet_value);
-  }
-
-  printf("\n=== Starting measurements ===\r\n\n");
+  HAL_StatusTypeDef hal_status = one_wire_reset();
+  one_wire_write_byte(0x33);
+  uint8_t rom_code[8];
+  for (int i = 0; i < 8; i++)
+    rom_code[i] = one_wire_read_byte();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
     /* USER CODE END WHILE */
-    /* USER CODE BEGIN 3 */
-    uint32_t adc = hw390_read_average_data(&soil_sensor, 10, 100);
-    uint8_t moisture = hw390_get_moisture_percent(&soil_sensor, adc);
 
-    printf("ADC: %u | Moisture: %u%%\r\n", adc, moisture);
-    HAL_Delay(5000);
+    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
