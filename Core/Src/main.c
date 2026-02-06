@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "one_wire.h"
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -97,6 +98,8 @@ int main(void) {
   uint8_t rom_code[8];
   for (int i = 0; i < 8; i++)
     rom_code[i] = one_wire_read_byte();
+
+  uint8_t crc = one_wire_calculate_crc8(rom_code, 7);
   /* USER CODE END 2 */
 
   /* Infinite loop */

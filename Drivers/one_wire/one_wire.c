@@ -1,9 +1,7 @@
 #include "one_wire.h"
-#include "delay_us.h"
-#include "main.h"
 
 HAL_StatusTypeDef one_wire_reset(void) {
-  int pin_state;
+  uint8_t pin_state;
 
   HAL_GPIO_WritePin(OW_DQ_GPIO_Port, OW_DQ_Pin, GPIO_PIN_RESET);
 
@@ -22,7 +20,7 @@ HAL_StatusTypeDef one_wire_reset(void) {
   return (pin_state == 0) ? HAL_OK : HAL_ERROR;
 }
 
-void one_wire_write_bit(int value) {
+void one_wire_write_bit(uint8_t value) {
   if (value) {
     HAL_GPIO_WritePin(OW_DQ_GPIO_Port, OW_DQ_Pin, GPIO_PIN_RESET);
 
@@ -46,8 +44,8 @@ void one_wire_write_bit(int value) {
   delay_us(1);
 }
 
-int one_wire_read_bit(void) {
-  int pin_state;
+uint8_t one_wire_read_bit(void) {
+  uint32_t pin_state;
 
   HAL_GPIO_WritePin(OW_DQ_GPIO_Port, OW_DQ_Pin, GPIO_PIN_RESET);
 
@@ -72,7 +70,7 @@ int one_wire_read_bit(void) {
 
 void one_wire_write_byte(uint8_t byte) {
   // Sending from LSB to MSB
-  for (int i = 0; i < 8; i++) {
+  for (uint8_t i = 0; i < 8; i++) {
     // e.g. byte & 0x01 -> 1010 0101 & 0000 0001 = 0000 0001 = 1
     one_wire_write_bit(byte & 0x01);
     byte >>= 1;
@@ -83,11 +81,37 @@ uint8_t one_wire_read_byte(void) {
   // Reading from LSB to MSB
   uint8_t value = 0;
 
-  for (int i = 0; i < 8; i++) {
+  for (uint8_t i = 0; i < 8; i++) {
     value >>= 1;
     if (one_wire_read_bit())
       value |= 0x80;
   }
 
   return value;
+}
+
+uint8_t one_wire_calculate_crc8(uint8_t *data, uint8_t length) {
+  uint8_t crc = 0x00;
+
+  for (uint8_t i = 0; i < length; i++) {
+    // XOR with current byte
+    crc ^= data[i];
+
+    for (uint8_t j = 0; j < 8; j++) {
+      // If LSB is 1
+      if (crc & 0x01) {
+        /**
+         * x^8+x^5+x^4+1 = 0x131
+         * its 8 degree polynominal so x^8 is implicit
+         * x^8 is dropped so its 0x31
+         * 0x31 is reversed because processing from LSB so 0x8C
+         */
+        crc = (crc >> 1) ^ 0x8C;
+      } else {
+        crc >>= 1;
+      }
+    }
+  }
+
+  return crc;
 }
