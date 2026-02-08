@@ -26,6 +26,7 @@
 /* USER CODE BEGIN Includes */
 #include "one_wire.h"
 #include <stdint.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,6 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MAX_ONE_WIRE_DEVICES 10
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -93,13 +95,30 @@ int main(void) {
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_StatusTypeDef hal_status = one_wire_reset();
-  one_wire_write_byte(0x33);
-  uint8_t rom_code[8];
-  for (int i = 0; i < 8; i++)
-    rom_code[i] = one_wire_read_byte();
+  uint8_t rom_codes[MAX_ONE_WIRE_DEVICES][8];
+  int8_t device_count = 0;
+  int8_t result;
 
-  uint8_t crc = one_wire_calculate_crc8(rom_code, 7);
+  one_wire_search_rom_reset();
+
+  while ((result = one_wire_search_rom(rom_codes[device_count])) == 1) {
+    printf("Device %d ROM: ", device_count);
+    for (int i = 0; i < 8; i++) {
+      printf("%02X ", rom_codes[device_count][i]);
+    }
+    printf("\r\n");
+
+    device_count++;
+    if (device_count >= MAX_ONE_WIRE_DEVICES) {
+      break;
+    }
+  }
+
+  if (result < 0) {
+    printf("Search error occurred\r\n");
+  } else {
+    printf("Found %d one-wire device(s)\r\n", device_count);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
