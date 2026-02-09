@@ -82,7 +82,7 @@ int main(void) {
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  delay_us_init();
+  ds18b20_init();
   /* USER CODE END Init */
 
   /* Configure the system clock */

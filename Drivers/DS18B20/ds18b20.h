@@ -25,6 +25,8 @@
 #define DS18B20_ROM_BYTES 8
 #define DS18B20_SCRATCHPAD_BYTES 9
 
+/* Function prototypes */
+void ds18b20_init(void);
 int8_t ds18b20_start_conversion(uint8_t *rom_code);
 int8_t ds18b20_start_conversion_all(void);
 int8_t ds18b20_read_temperature(uint8_t *rom_code, float *temperature);

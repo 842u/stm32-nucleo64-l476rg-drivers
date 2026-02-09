@@ -4,6 +4,16 @@
 #include <stdint.h>
 
 /**
+ * @brief Initialize DS18B20 module
+ *
+ * Initializes DS18B20 driver.
+ * Call once before using DS18B20 functions.
+ *
+ * @note Requires GPIO configured as Open-Drain with 4.7kΩ pullup resistor
+ */
+void ds18b20_init(void) { one_wire_init(); }
+
+/**
  * @brief Start temperature conversion
  *
  * Initiates a temperature conversion on the specified DS18B20 sensor.

@@ -1,4 +1,22 @@
 #include "one_wire.h"
+#include "delay_us.h"
+
+/* Persistent Search ROM State */
+static uint8_t LastDiscrepancy = 0;
+static uint8_t LastFamilyDiscrepancy = 0;
+static uint8_t LastDeviceFlag = 0;
+static uint8_t ROM_NO[8] = {0};
+
+/**
+ * @brief Initialize 1-Wire interface
+ *
+ * Initializes the 1-Wire bitbanging driver.
+ * Must be called once before using any 1-Wire functions.
+ *
+ * @note Currently initializes microsecond delay timer for precise timing
+ * @note GPIO configuration should be done separately (in CubeMX or manually)
+ */
+void one_wire_init(void) { delay_us_init(); }
 
 /**
  * @brief Initialize 1-Wire bus and detect presence of slave devices

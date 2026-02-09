@@ -6,12 +6,7 @@
 #include "stm32l4xx_hal.h"
 #include <string.h>
 
-/* Persistent Search ROM State */
-static uint8_t LastDiscrepancy = 0;
-static uint8_t LastFamilyDiscrepancy = 0;
-static uint8_t LastDeviceFlag = 0;
-static uint8_t ROM_NO[8] = {0};
-
+void one_wire_init(void);
 HAL_StatusTypeDef one_wire_reset(void);
 void one_wire_write_bit(uint8_t value);
 uint8_t one_wire_read_bit(void);
