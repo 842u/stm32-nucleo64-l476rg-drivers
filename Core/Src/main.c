@@ -18,15 +18,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "delay_us.h"
 #include "gpio.h"
 #include "usart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ds18b20.h"
 #include "one_wire.h"
 #include <stdint.h>
 #include <stdio.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,6 +99,8 @@ int main(void) {
   uint8_t rom_codes[MAX_ONE_WIRE_DEVICES][8];
   int8_t device_count = 0;
   int8_t result;
+  uint8_t scratchpad[DS18B20_SCRATCHPAD_BYTES];
+  float temperature;
 
   one_wire_search_rom_reset();
 
@@ -127,6 +130,25 @@ int main(void) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    // Start conversion
+    if (ds18b20_start_conversion(rom_codes[0]) == 0) {
+      printf("Conversion started...\n");
+    }
+
+    if (ds18b20_read_scratchpad(rom_codes[0], scratchpad) == 0) {
+      printf("SCRATCHPAD: ");
+      for (int i = 0; i < 9; i++) {
+        printf("%02X ", scratchpad[i]);
+      }
+      printf("\r\n");
+    }
+
+    // Read temperature
+    // Wait for ready (750ms for 12 bit resolution)
+    HAL_Delay(750);
+    if (ds18b20_read_temperature(rom_codes[0], &temperature) == 0) {
+      printf("Temperature: %.2f°C\n", temperature);
+    }
   }
   /* USER CODE END 3 */
 }

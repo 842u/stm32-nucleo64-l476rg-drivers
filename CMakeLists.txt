@@ -51,6 +51,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Drivers/GDM1602A/gdm1602a.c
     # Drivers/GDM1602A/gdm1602a_test.c
     # Drivers/HW390/hw390.c
+    Drivers/DS18B20/ds18b20.c
     Drivers/one_wire/one_wire.c
     )
 
@@ -62,6 +63,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Drivers/AHT20
     # Drivers/GDM1602A
     # Drivers/HW390
+    Drivers/DS18B20
     Drivers/one_wire
 )
 
